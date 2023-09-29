@@ -1,7 +1,6 @@
 import {
   DeepPartial,
   DeleteResult,
-  FindManyOptions,
   FindOneOptions,
   FindOptionsWhere,
   Repository,
@@ -22,27 +21,13 @@ export class CrudService<T> {
   protected constructor(protected readonly repository: Repository<T>) {}
 
   /**
-   * Counts entities that match given options.
-   * Useful for pagination.
-   *
-   * @param options
-   * @returns
-   */
-  public async count(options?: FindManyOptions<T>): Promise<number> {
-    return await this.repository.count(options);
-  }
-
-  /**
    * Finds entities that match given find options with pagination.
    * Also counts all entities that match given conditions,
    * @param options
    * @returns
    */
-  public async findAll(
-    paginationOptions: IPaginationOptions,
-    options?: FindManyOptions<T>,
-  ) {
-    return paginate<T>(this.repository, paginationOptions, options);
+  public async findAll(paginationOptions: IPaginationOptions) {
+    return paginate<T>(this.repository, paginationOptions);
   }
 
   /**
