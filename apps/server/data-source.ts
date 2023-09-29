@@ -1,5 +1,6 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import * as dotenv from 'dotenv';
+import { DataSource, DataSourceOptions } from 'typeorm';
 
 // using dotenv to access process.env
 dotenv.config();
@@ -17,4 +18,7 @@ export const typeOrmModuleOptions: TypeOrmModuleOptions = {
   autoLoadEntities: true,
 };
 
-export default typeOrmModuleOptions;
+// exporting the DataSource object for migration cli
+const dataSource = new DataSource(typeOrmModuleOptions as DataSourceOptions);
+
+export default dataSource;
