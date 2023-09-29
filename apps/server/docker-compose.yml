@@ -1,0 +1,19 @@
+version: '3.9'
+
+services:
+  allergy-db:
+    image: postgres:alpine
+    networks:
+      - allergy-db
+    volumes:
+      - ./data/postgres:/data/postgres
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=allergydb
+    ports:
+      - 5432:5432
+
+networks:
+  allergy-db:
+    driver: bridge
