@@ -1,0 +1,10 @@
+{
+  "name": "@allergy-management/models",
+  "version": "1.0.0",
+  "description": "Models package for sharing interfaces and types",
+  "main": "index.ts",
+  "main:src": "index.ts",
+  "author": "Rupak",
+  "license": "MIT",
+  "private": true
+}

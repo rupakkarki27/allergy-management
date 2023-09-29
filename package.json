@@ -1,0 +1,16 @@
+{
+  "name": "@allergy-management/root",
+  "version": "1.0.0",
+  "description": "Monorepo for the allergy management system",
+  "main": "index.js",
+  "license": "MIT",
+  "author": {
+    "name": "Rupak Karki"
+  },
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "apps/*"
+    ]
+  }
+}
