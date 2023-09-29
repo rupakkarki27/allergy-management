@@ -1,8 +1,30 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { ConfigService } from '@nestjs/config';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
+
+  // getting the reference to the config service from the app
+  const configService = app.get<ConfigService<IConfig>>(ConfigService);
+
+  // set API global prefix to /api
+  app.setGlobalPrefix(configService.get('GLOBAL_PREFIX'));
+
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('Allergy Management System')
+    .setVersion('1.0.0')
+    .addBearerAuth()
+    .build();
+
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+
+  SwaggerModule.setup(configService.get('SWAGGER_ROUTE'), app, document, {
+    swaggerOptions: { persistAuthorization: true },
+  });
+
+  await app.listen(configService.get('PORT'));
 }
+
 bootstrap();
