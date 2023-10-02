@@ -25,6 +25,9 @@ import { CreateAllergyDto } from './dto/create-allergy.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { UpdateAllergyDto } from './dto/update-allergy.dto';
+import { UserRole } from '@allergy-management/models';
+import { HasRoles } from '../auth/decorators/has-roles.decorator';
+import { RolesGuard } from '../auth/guards/role.guard';
 
 @ApiTags('allergies')
 @ApiBearerAuth()
@@ -44,6 +47,8 @@ export class AllergyController extends CrudController<Allergy> {
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateAllergyDto })
   @UseInterceptors(FileInterceptor('file'))
+  @UseGuards(RolesGuard)
+  @HasRoles(UserRole.ADMIN)
   @Post('/')
   async create(
     @Body() body: CreateAllergyDto,
@@ -70,6 +75,8 @@ export class AllergyController extends CrudController<Allergy> {
 
   @ApiOperation({ description: 'Creates an allergy' })
   @ApiBody({ type: UpdateAllergyDto })
+  @UseGuards(RolesGuard)
+  @HasRoles(UserRole.ADMIN)
   @Put('/:id')
   async update(
     @Param('id') id: string,

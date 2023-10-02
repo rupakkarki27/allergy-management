@@ -1,8 +1,20 @@
-import { Body, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
+import {
+  Body,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { CrudService } from './crud.service';
 import { ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { DeepPartial } from 'typeorm';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
+import { HasRoles } from '../../modules/auth/decorators/has-roles.decorator';
+import { UserRole } from '@allergy-management/models';
+import { RolesGuard } from '../../modules/auth/guards/role.guard';
 
 export class CrudController<T> {
   protected constructor(private crudService: CrudService<T>) {}
@@ -50,6 +62,8 @@ export class CrudController<T> {
   @ApiOperation({
     description: 'Creates a new record',
   })
+  @UseGuards(RolesGuard)
+  @HasRoles(UserRole.ADMIN)
   @Post()
   public async create(
     @Body() entity: DeepPartial<T>,
@@ -69,6 +83,8 @@ export class CrudController<T> {
   @ApiOperation({
     description: 'Updates a record',
   })
+  @UseGuards(RolesGuard)
+  @HasRoles(UserRole.ADMIN)
   @Put(':id')
   public async update(
     @Param('id') id: string,
@@ -86,6 +102,8 @@ export class CrudController<T> {
   @ApiOperation({
     description: 'Deletes a record',
   })
+  @UseGuards(RolesGuard)
+  @HasRoles(UserRole.ADMIN)
   @Delete('/:id')
   public async delete(@Param('id') id: string) {
     return this.crudService.delete(id);
