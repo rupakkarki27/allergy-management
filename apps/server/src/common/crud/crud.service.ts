@@ -99,7 +99,7 @@ export class CrudService<T> {
       return await this.repository.save(obj);
     } catch (err) {
       if (err?.driverError?.code === '23505') {
-        throw new ConflictException();
+        throw new ConflictException('This record already exists.');
       } else throw new BadRequestException();
     }
   }
@@ -115,7 +115,12 @@ export class CrudService<T> {
     partialEntity: QueryDeepPartialEntity<T>,
   ): Promise<UpdateResult | T> {
     try {
-      return await this.repository.update(id, partialEntity);
+      // update the updatedAt column
+      const date = new Date();
+      return await this.repository.update(id, {
+        ...partialEntity,
+        updatedAt: date,
+      });
     } catch (err) {
       throw new BadRequestException(err);
     }

@@ -1,3 +1,12 @@
+export enum UserRole {
+  ADMIN = "admin",
+  USER = "user",
+}
+
 export interface IUser {
-  name: string;
+  id: string;
+  email: string;
+  role: UserRole;
+  createdAt?: string;
+  updatedAt?: string;
 }
