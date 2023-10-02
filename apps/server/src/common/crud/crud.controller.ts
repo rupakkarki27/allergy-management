@@ -51,7 +51,11 @@ export class CrudController<T> {
     description: 'Creates a new record',
   })
   @Post()
-  public async create(@Body() entity: DeepPartial<T>) {
+  public async create(
+    @Body() entity: DeepPartial<T>,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    file?: Express.Multer.File,
+  ) {
     return this.crudService.create(entity);
   }
 
@@ -80,9 +84,9 @@ export class CrudController<T> {
    * @returns
    */
   @ApiOperation({
-    description: 'Updates a record',
+    description: 'Deletes a record',
   })
-  @Delete('id')
+  @Delete('/:id')
   public async delete(@Param('id') id: string) {
     return this.crudService.delete(id);
   }
