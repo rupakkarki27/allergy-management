@@ -36,6 +36,7 @@ async function bootstrap() {
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Allergy Management System')
     .setVersion('1.0.0')
+    .setExternalDoc('Postman Collection', '/docs-json')
     .addBearerAuth()
     .build();
 
