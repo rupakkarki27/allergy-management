@@ -5,4 +5,6 @@ interface IConfig {
   APP_DOMAIN?: string;
 
   SWAGGER_ROUTE?: string;
+
+  JWT_SECRET?: string;
 }

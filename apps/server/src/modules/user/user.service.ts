@@ -12,4 +12,14 @@ export class UserService extends CrudService<User> {
   ) {
     super(userRepository);
   }
+
+  async getAllUserDetails(email: string) {
+    // if marking password field as select:false, we need to use this query, and select password manually
+    const user = await User.createQueryBuilder('user')
+      .addSelect('user.password')
+      .where('user.email = :email', { email })
+      .getOne();
+
+    return user;
+  }
 }

@@ -99,7 +99,7 @@ export class CrudService<T> {
       return await this.repository.save(obj);
     } catch (err) {
       if (err?.driverError?.code === '23505') {
-        throw new ConflictException();
+        throw new ConflictException('This record already exists.');
       } else throw new BadRequestException();
     }
   }
