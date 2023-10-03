@@ -1,6 +1,7 @@
 import {
   DeepPartial,
   DeleteResult,
+  FindManyOptions,
   FindOneOptions,
   FindOptionsWhere,
   Repository,
@@ -26,8 +27,11 @@ export class CrudService<T> {
    * @param options
    * @returns
    */
-  public async findAll(paginationOptions: IPaginationOptions) {
-    return paginate<T>(this.repository, paginationOptions);
+  public async findAll(
+    paginationOptions: IPaginationOptions,
+    searchOptions?: FindOptionsWhere<T> | FindManyOptions<T>,
+  ) {
+    return paginate<T>(this.repository, paginationOptions, searchOptions);
   }
 
   /**

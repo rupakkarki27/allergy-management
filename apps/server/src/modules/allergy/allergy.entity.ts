@@ -17,6 +17,9 @@ export class Allergy extends CustomBaseEntity {
   })
   severity: AllergySeverity;
 
+  @Column({ type: 'boolean', default: false })
+  isHighRisk: boolean;
+
   @Column({ nullable: true })
   image?: string;
 

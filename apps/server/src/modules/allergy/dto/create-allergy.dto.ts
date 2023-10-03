@@ -28,6 +28,9 @@ export class CreateAllergyDto {
   @IsNotEmpty()
   severity: AllergySeverity;
 
+  @ApiProperty({ type: Boolean })
+  isHighRisk: boolean;
+
   @ApiProperty({ type: 'string', format: 'binary', required: true })
   file: Express.Multer.File;
 
