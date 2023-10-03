@@ -5,15 +5,18 @@ import { IsEnum } from 'class-validator';
 
 export class UpdateAllergyDto {
   @ApiPropertyOptional()
-  name: string;
+  name?: string;
 
   @ApiPropertyOptional({ isArray: true, type: String })
   @Transform(({ value }) => (Array.isArray(value) ? value : Array(value)))
-  symptoms: string[];
+  symptoms?: string[];
 
   @ApiPropertyOptional()
   @IsEnum(AllergySeverity)
-  severity: AllergySeverity;
+  severity?: AllergySeverity;
+
+  @ApiPropertyOptional({ type: Boolean })
+  isHighRisk?: boolean;
 
   @ApiPropertyOptional()
   notes?: string;

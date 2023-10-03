@@ -3,6 +3,7 @@ export interface IAllergy {
   name: string;
   symptoms: string[];
   severity: AllergySeverity;
+  isHighRisk: boolean;
   image?: string;
   notes?: string;
 }

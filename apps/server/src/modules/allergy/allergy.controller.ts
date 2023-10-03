@@ -2,10 +2,12 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   InternalServerErrorException,
   Param,
   Post,
   Put,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -15,6 +17,7 @@ import {
   ApiBody,
   ApiConsumes,
   ApiOperation,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { JwtGuard } from '../auth/guards/jwt.guard';
@@ -39,6 +42,35 @@ export class AllergyController extends CrudController<Allergy> {
     private cloudinaryService: CloudinaryService,
   ) {
     super(allergyService);
+  }
+
+  /**
+   * Endpoint to get all the allergies by pagination - overriding it to add custom search options
+   * GET /{resource}
+   * @param page the page number for pagination
+   * @param limit total limit in one page
+   * @returns
+   */
+  @ApiOperation({
+    description: 'Finds all allergies with pagination',
+  })
+  @ApiQuery({ name: 'page', type: 'number', required: false, example: 1 })
+  @ApiQuery({ name: 'limit', type: 'number', required: false, example: 10 })
+  @Get()
+  public async findAll(
+    @Query('page') page: string,
+    @Query('limit') limit: string,
+  ) {
+    return this.allergyService.findAll(
+      { page: page || 1, limit: limit || 10 },
+      // always show high risk allergies at the top with alphabetical ordering
+      {
+        order: {
+          isHighRisk: { direction: 'DESC' },
+          name: { direction: 'ASC' },
+        },
+      },
+    );
   }
 
   // Overriding the create method because we need it to have a custom Dto
