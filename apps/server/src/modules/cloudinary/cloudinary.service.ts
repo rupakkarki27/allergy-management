@@ -5,14 +5,12 @@ import {
   v2 as cloudinary,
 } from 'cloudinary';
 import { Readable } from 'stream';
-import * as dotenv from 'dotenv';
-
-dotenv.config();
+import { Config } from '../../common/config';
 
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: Config.CLOUDINARY_CLOUD_NAME,
+  api_key: Config.CLOUDINARY_API_KEY,
+  api_secret: Config.CLOUDINARY_API_SECRET,
 });
 
 @Injectable()

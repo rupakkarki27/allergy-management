@@ -11,9 +11,6 @@ import {
 } from '@nestjs/common';
 
 const user = new User();
-user.id = 'example-uuid';
-user.firstName = 'Rupak';
-user.lastName = 'Karki';
 user.email = 'rupakkarki123@gmail.com';
 user.role = UserRole.ADMIN;
 
@@ -96,8 +93,6 @@ describe('UserService', () => {
       expect(
         service.create({
           email: 'rupakkarki123@gmail.com',
-          firstName: 'Rupak',
-          lastName: 'Karki',
           password: 'hashedpassword',
           role: UserRole.ADMIN,
         }),
@@ -109,9 +104,7 @@ describe('UserService', () => {
       await expect(
         service.create({
           email: 'rupakkarki123@gmail.com',
-          firstName: 'Rupak',
           password: 'hashedpassword',
-          lastName: 'Karki',
           role: UserRole.ADMIN,
         }),
       ).rejects.toThrow(BadRequestException);
@@ -125,8 +118,6 @@ describe('UserService', () => {
         service.create({
           email: 'rupakkarki123@gmail.com',
           password: 'hashedpassword',
-          firstName: 'Rupak',
-          lastName: 'Karki',
           role: UserRole.ADMIN,
         }),
       ).rejects.toThrowError(ConflictException);

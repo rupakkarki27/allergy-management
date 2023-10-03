@@ -11,4 +11,10 @@ interface IConfig {
   CLOUDINARY_CLOUD_NAME?: string;
   CLOUDINARY_API_KEY?: string;
   CLOUDINARY_API_SECRET?: string;
+
+  DATABASE_HOST?: string;
+  POSTGRES_PASSWORD?: string;
+  POSTGRES_DB?: string;
+  POSTGRES_PORT?: string;
+  POSTGRES_USER?: string;
 }
