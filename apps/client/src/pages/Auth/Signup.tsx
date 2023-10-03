@@ -12,10 +12,14 @@ import {
   Button,
   FormHelperText,
 } from "@mui/material";
+import { useMutation } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import React from "react";
 import { Link } from "react-router-dom";
 import * as Yup from "yup";
+import AuthService, { AuthDto } from "../../services/auth";
+import { useAppDispatch } from "../../store";
+import { setSuccess } from "../../store/Snackbar/snackbar.slice";
 
 const SignupSchema = Yup.object().shape({
   email: Yup.string().required("Email is required").email("Enter valid email"),
@@ -38,11 +42,22 @@ interface IInitialState {
 const Signup = () => {
   const [showPassword, setShowPassword] = React.useState(false);
 
+  const dispatch = useAppDispatch();
+
+  const signup = useMutation({
+    mutationKey: ["signup"],
+    mutationFn: (body: AuthDto) => AuthService.signUp(body),
+    onSuccess: () => {
+      dispatch(setSuccess({ message: "Signup successful" }));
+      formik.resetForm();
+    },
+  });
+
   const formik = useFormik<IInitialState>({
     initialValues: { email: "", password: "" },
     validationSchema: SignupSchema,
     onSubmit: (values) => {
-      console.log(values);
+      signup.mutate(values);
     },
   });
 

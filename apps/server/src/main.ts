@@ -33,6 +33,8 @@ async function bootstrap() {
     }),
   );
 
+  app.enableCors();
+
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Allergy Management System')
     .setVersion('1.0.0')
