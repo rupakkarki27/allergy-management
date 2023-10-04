@@ -1,11 +1,12 @@
 import { Route, Routes } from "react-router-dom";
 import "./App.css";
-import { publicRoutes } from "./routes";
+import { privateRoutes, publicRoutes } from "./routes";
 import Signin from "./pages/Auth/Signin";
 import { Alert, Snackbar } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "./store";
 import { hideSnackbar } from "./store/Snackbar/snackbar.slice";
 import { useEffect } from "react";
+import ProtectedRoute from "./routes/ProtectedRoute";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -26,7 +27,15 @@ function App() {
         <Route path="/" Component={Signin} />
 
         {publicRoutes.map((r) => (
-          <Route path={r.path} Component={r.Component} key={r.path} />
+          <Route path={r.path} element={r.element} key={r.path} />
+        ))}
+
+        {privateRoutes.map((r) => (
+          <Route
+            path={r.path}
+            element={<ProtectedRoute>{r.element}</ProtectedRoute>}
+            key={r.path}
+          />
         ))}
       </Routes>
       <Snackbar open={snackbar?.showSnackBar} autoHideDuration={3000}>

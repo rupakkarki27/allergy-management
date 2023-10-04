@@ -15,7 +15,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import AuthService, { AuthDto } from "../../services/auth";
 import { useAppDispatch } from "../../store";
@@ -43,12 +43,14 @@ const Signup = () => {
   const [showPassword, setShowPassword] = React.useState(false);
 
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const signup = useMutation({
     mutationKey: ["signup"],
     mutationFn: (body: AuthDto) => AuthService.signUp(body),
     onSuccess: () => {
       dispatch(setSuccess({ message: "Signup successful" }));
+      navigate("/signin");
       formik.resetForm();
     },
   });
@@ -121,8 +123,9 @@ const Signup = () => {
                   height: 50,
                 }}
                 onClick={formik.submitForm}
+                disabled={signup.isLoading}
               >
-                Sign up
+                {signup.isLoading ? "Loading" : "Sign up"}
               </Button>
             </Stack>
             <h4>

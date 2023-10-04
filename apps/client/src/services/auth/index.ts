@@ -17,7 +17,7 @@ class Auth {
   }
 
   async signIn(body: AuthDto) {
-    const response = await api.post<{ accessToken: string }>(
+    const response = await api.post<{ token: string; user: IUser }>(
       "/auth/signin",
       body
     );
