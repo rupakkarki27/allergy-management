@@ -41,7 +41,7 @@ export class AuthService {
   async signIn(user: Partial<User>) {
     const token = await this.generateToken(user);
 
-    return token;
+    return { token: token.accessToken, user };
   }
 
   async validateUser(email: string, password: string) {
