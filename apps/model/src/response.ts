@@ -10,3 +10,9 @@ export interface IApiPaginationResponse<T> {
   items: T[];
   meta: IPaginationMeta;
 }
+
+export interface IApiErrorResponse {
+  message?: string;
+  statusCode?: number;
+  error?: string;
+}

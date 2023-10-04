@@ -11,12 +11,18 @@ import {
   persistStore,
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
+import AuthReducer from "./Auth/auth.slice";
+import SnackbarReducer from "./Snackbar/snackbar.slice";
 
-const reducers = combineReducers({});
+const reducers = combineReducers({
+  auth: AuthReducer,
+  snackbar: SnackbarReducer,
+});
 
 const persistConfig = {
   key: "root",
   storage,
+  whitelist: ["auth"],
 };
 
 const persistedReducer = persistReducer(persistConfig, reducers);
