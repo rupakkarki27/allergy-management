@@ -11,6 +11,12 @@ class Allergy {
 
     return response.data;
   }
+
+  async getAllergy(id: string) {
+    const response = await api.get<IAllergy>(`${this.uri}/${id}`);
+
+    return response.data;
+  }
 }
 
 const AllergyService = new Allergy();
