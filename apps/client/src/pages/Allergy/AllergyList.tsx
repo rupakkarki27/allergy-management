@@ -4,6 +4,7 @@ import AllergyService from "../../services/allergy";
 import {
   Box,
   Breadcrumbs,
+  Button,
   CircularProgress,
   Grid,
   Link,
@@ -11,12 +12,16 @@ import {
 } from "@mui/material";
 import AllergyCard from "../../components/AllergyCard";
 import Layout from "../../components/Layout";
+import { Add } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 const AllergyList = () => {
   const [{ page, pageSize }, setPagination] = React.useState({
     page: 1,
     pageSize: 12,
   });
+
+  const navigate = useNavigate();
 
   const { data: allergies, isLoading } = useQuery({
     queryKey: ["allergies-list", page, pageSize],
@@ -29,16 +34,30 @@ const AllergyList = () => {
   ) : (
     <React.Fragment>
       <Layout title="Allergies">
-        <Breadcrumbs aria-label="breadcrumb">
-          <Link underline="hover" color="inherit" href="/allergies">
-            Allergies
-          </Link>
-          <Link
-            underline="hover"
-            color="inherit"
-            href="/material-ui/getting-started/installation/"
-          ></Link>
-        </Breadcrumbs>
+        <Grid
+          container
+          direction={"row"}
+          justifyContent={"space-between"}
+          alignItems={"center"}
+        >
+          <Grid item sx={{ width: 200 }}>
+            <Breadcrumbs aria-label="breadcrumb">
+              <Link underline="hover" color="inherit" href="/allergies">
+                Allergies
+              </Link>
+              <Link underline="hover" color="inherit"></Link>
+            </Breadcrumbs>
+          </Grid>
+          <Grid item>
+            <Button
+              startIcon={<Add />}
+              variant="outlined"
+              onClick={() => navigate("/allergies/add")}
+            >
+              New Allergy
+            </Button>
+          </Grid>
+        </Grid>
         <Grid
           container
           spacing={2}

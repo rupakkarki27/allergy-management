@@ -3,6 +3,7 @@ import Signup from "../pages/Auth/Signup";
 import Signin from "../pages/Auth/Signin";
 import AllergyList from "../pages/Allergy/AllergyList";
 import AllergyDetail from "../pages/Allergy/AllergyDetail";
+import NewAllergy from "../pages/Allergy/NewAllergy";
 
 export const publicRoutes: PathRouteProps[] = [
   { path: "/signup", element: <Signup /> },
@@ -12,4 +13,5 @@ export const publicRoutes: PathRouteProps[] = [
 export const privateRoutes: PathRouteProps[] = [
   { path: "/allergies", element: <AllergyList /> },
   { path: "/allergies/:id", element: <AllergyDetail /> },
+  { path: "/allergies/add", element: <NewAllergy /> },
 ];
