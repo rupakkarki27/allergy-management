@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-export const Config: IConfig = {
+export const Config = {
   API_VERSION: process.env.API_VERSION as unknown as number,
   APP_DOMAIN: process.env.APP_DOMAIN,
   CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
