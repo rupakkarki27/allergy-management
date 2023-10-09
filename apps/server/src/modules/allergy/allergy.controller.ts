@@ -61,16 +61,7 @@ export class AllergyController extends CrudController<Allergy> {
     @Query('page') page: string,
     @Query('limit') limit: string,
   ) {
-    return this.allergyService.findAll(
-      { page: page || 1, limit: limit || 10 },
-      // always show high risk allergies at the top with alphabetical ordering
-      {
-        order: {
-          isHighRisk: { direction: 'DESC' },
-          name: { direction: 'ASC' },
-        },
-      },
-    );
+    return this.allergyService.findAll({ page: page || 1, limit: limit || 10 });
   }
 
   // Overriding the create method because we need it to have a custom Dto
