@@ -18,23 +18,21 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React from "react";
 import Layout from "../../components/Layout";
-import { styled } from "@mui/material/styles";
-import { Image } from "@mui/icons-material";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import AllergyService from "../../services/allergy";
 import { useAppDispatch } from "../../store";
 import { setError, setSuccess } from "../../store/Snackbar/snackbar.slice";
-import { useNavigate } from "react-router-dom";
-import { IApiErrorResponse } from "@allergy-management/models";
+import { useNavigate, useParams } from "react-router-dom";
+import { IAllergy, IApiErrorResponse } from "@allergy-management/models";
 import { AxiosError } from "axios";
 
-interface IAddAllergy {
+interface IEditAllergy {
   name: string;
-  symptoms: string;
+  symptoms: string[] | string;
   severity: string;
   isHighRisk: boolean;
   notes?: string;
@@ -63,7 +61,7 @@ const severityList = [
   },
 ];
 
-const AddNewAllergySchema = Yup.object().shape({
+const EditAllergySchema = Yup.object().shape({
   name: Yup.string().required("Name is required"),
   symptoms: Yup.string()
     .required("Symptoms are required")
@@ -75,31 +73,21 @@ const AddNewAllergySchema = Yup.object().shape({
   severity: Yup.string().required("Please select a severity"),
 });
 
-const VisuallyHiddenInput = styled("input")({
-  clip: "rect(0 0 0 0)",
-  clipPath: "inset(50%)",
-  height: 1,
-  overflow: "hidden",
-  position: "absolute",
-  bottom: 0,
-  left: 0,
-  whiteSpace: "nowrap",
-  width: 1,
-});
-
-const NewAllergy = () => {
-  const [image, setImage] = useState<File>();
+const EditAllergy = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const addAllergy = useMutation({
-    mutationKey: ["add-allergy"],
-    mutationFn: (body: FormData) => AllergyService.createAllergy(body),
-    onSuccess: (data) => {
-      dispatch(setSuccess({ message: "Allergy added successfully" }));
-      queryClient.invalidateQueries({ queryKey: ["allergies-list"] });
-      navigate(`/allergies/${data.id}`);
+  const { id } = useParams<{ id: string }>();
+
+  const editAllergy = useMutation({
+    mutationKey: ["edit-allergy"],
+    mutationFn: (body: Partial<IAllergy>) =>
+      AllergyService.updateAllergy(id as string, body),
+    onSuccess: () => {
+      dispatch(setSuccess({ message: "Allergy edited successfully" }));
+      queryClient.invalidateQueries({ queryKey: ["allergy-detail"] });
+      navigate(`/allergies/${id}`);
     },
     onError: (e: AxiosError<IApiErrorResponse>) => {
       dispatch(
@@ -110,36 +98,38 @@ const NewAllergy = () => {
     },
   });
 
-  const onSubmit = (values: IAddAllergy) => {
-    const formData = new FormData();
+  const { data: existingAllergy } = useQuery({
+    queryKey: ["allergy-detail", id],
+    queryFn: () => AllergyService.getAllergy(id as string),
+  });
 
-    const symptoms = values.symptoms.split(",");
+  const onSubmit = (values: IEditAllergy) => {
+    values = {
+      ...values,
+      symptoms:
+        typeof values.symptoms === "string"
+          ? values.symptoms.split(",")
+          : values.symptoms,
+    };
 
-    formData.append("name", values.name);
-    values.notes && formData.append("notes", values.notes);
-    formData.append("symptoms", symptoms.toString());
-    formData.append("isHighRisk", String(values.isHighRisk));
-    formData.append("severity", values.severity);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    formData.append("file", image as any);
-
-    addAllergy.mutate(formData);
+    editAllergy.mutate(values as Partial<IAllergy>);
   };
 
-  const formik = useFormik<IAddAllergy>({
+  const formik = useFormik<IEditAllergy>({
     initialValues: {
-      isHighRisk: false,
-      name: "",
-      severity: "",
-      symptoms: "",
-      notes: "",
+      isHighRisk: existingAllergy?.isHighRisk || false,
+      name: existingAllergy?.name || "",
+      severity: existingAllergy?.severity || "",
+      symptoms: existingAllergy?.symptoms.join(",") || "",
+      notes: existingAllergy?.notes || "",
     },
-    validationSchema: AddNewAllergySchema,
+    validationSchema: EditAllergySchema,
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: (values) => {
       onSubmit(values);
     },
+    enableReinitialize: true,
   });
 
   return (
@@ -150,7 +140,7 @@ const NewAllergy = () => {
             Allergies
           </Link>
           <Link underline="hover" color="inherit">
-            New Allergy
+            Edit
           </Link>
         </Breadcrumbs>
         <Grid
@@ -181,23 +171,9 @@ const NewAllergy = () => {
                 <Stack gap={2}>
                   <Box sx={{ alignSelf: "center" }}>
                     <Avatar
-                      src={image && URL.createObjectURL(image as Blob)}
+                      src={existingAllergy?.image}
                       sx={{ height: 200, width: 200, alignSelf: "center" }}
                     />
-                    <Button
-                      component="label"
-                      variant="outlined"
-                      startIcon={<Image />}
-                      fullWidth
-                      sx={{ marginTop: 2 }}
-                    >
-                      Image
-                      <VisuallyHiddenInput
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => setImage(e.target?.files![0])}
-                      />
-                    </Button>
                   </Box>
                   <TextField
                     label="Allergy Name"
@@ -259,6 +235,7 @@ const NewAllergy = () => {
                   <FormControlLabel
                     control={
                       <Checkbox
+                        checked={formik.values.isHighRisk}
                         onChange={(e) =>
                           formik.setFieldValue("isHighRisk", e.target.checked)
                         }
@@ -270,9 +247,9 @@ const NewAllergy = () => {
                     fullWidth
                     variant="contained"
                     onClick={formik.submitForm}
-                    disabled={addAllergy.isLoading}
+                    disabled={editAllergy.isLoading}
                   >
-                    {addAllergy.isLoading ? "Loading..." : "Save"}
+                    {editAllergy.isLoading ? "Loading..." : "Save"}
                   </Button>
                 </Stack>
               </CardContent>
@@ -284,4 +261,4 @@ const NewAllergy = () => {
   );
 };
 
-export default NewAllergy;
+export default EditAllergy;

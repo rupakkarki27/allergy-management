@@ -81,7 +81,7 @@ const Signin = () => {
 
   return (
     <React.Fragment>
-      <div>
+      <Stack height={"100vh"} justifyContent={"center"}>
         <Container maxWidth="sm">
           <Card sx={{ padding: 4 }}>
             <h2>Welcome to Allergy Management System</h2>
@@ -145,7 +145,7 @@ const Signin = () => {
             </h4>
           </Card>
         </Container>
-      </div>
+      </Stack>
     </React.Fragment>
   );
 };

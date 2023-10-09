@@ -27,6 +27,18 @@ class Allergy {
 
     return response.data;
   }
+
+  async updateAllergy(id: string, body: Partial<IAllergy>) {
+    const response = await api.put(`${this.uri}/${id}`, body);
+
+    return response.data;
+  }
+
+  async deleteAllergy(id: string) {
+    const response = await api.delete(`${this.uri}/${id}`);
+
+    return response.data;
+  }
 }
 
 const AllergyService = new Allergy();

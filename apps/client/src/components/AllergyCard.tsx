@@ -20,7 +20,7 @@ const AllergyCard: React.FC<IAllergyCard> = ({ allergy }) => {
   const navigate = useNavigate();
 
   return (
-    <Card sx={{ minWidth: 220 }}>
+    <Card sx={{ maxWidth: 260, minWidth: 260, minHeight: 370, maxHeight: 370 }}>
       <CardContent
         sx={{
           display: "flex",
