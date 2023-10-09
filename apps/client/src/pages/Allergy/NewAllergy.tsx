@@ -8,6 +8,7 @@ import {
   Checkbox,
   FormControl,
   FormControlLabel,
+  FormHelperText,
   Grid,
   InputLabel,
   Link,
@@ -21,6 +22,23 @@ import React, { useState } from "react";
 import Layout from "../../components/Layout";
 import { styled } from "@mui/material/styles";
 import { Image } from "@mui/icons-material";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import AllergyService from "../../services/allergy";
+import { useAppDispatch } from "../../store";
+import { setError, setSuccess } from "../../store/Snackbar/snackbar.slice";
+import { useNavigate } from "react-router-dom";
+import { IApiErrorResponse } from "@allergy-management/models";
+import { AxiosError } from "axios";
+
+interface IAddAllergy {
+  name: string;
+  symptoms: string;
+  severity: string;
+  isHighRisk: boolean;
+  notes?: string;
+}
 
 const severityList = [
   {
@@ -45,6 +63,18 @@ const severityList = [
   },
 ];
 
+const AddNewAllergySchema = Yup.object().shape({
+  name: Yup.string().required("Name is required"),
+  symptoms: Yup.string()
+    .required("Symptoms are required")
+    .matches(/\w+(,\s*\w+)*/, {
+      message: "Symptoms must be separated by commas",
+    }),
+  notes: Yup.string().optional(),
+  isHighRisk: Yup.boolean(),
+  severity: Yup.string().required("Please select a severity"),
+});
+
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
   clipPath: "inset(50%)",
@@ -59,8 +89,57 @@ const VisuallyHiddenInput = styled("input")({
 
 const NewAllergy = () => {
   const [image, setImage] = useState<File>();
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  console.log(image);
+  const addAllergy = useMutation({
+    mutationKey: ["add-allergy"],
+    mutationFn: (body: FormData) => AllergyService.createAllergy(body),
+    onSuccess: () => {
+      dispatch(setSuccess({ message: "Allergy added successfully" }));
+      queryClient.invalidateQueries({ queryKey: ["allergies-list"] });
+      navigate("/allergies");
+    },
+    onError: (e: AxiosError<IApiErrorResponse>) => {
+      dispatch(
+        setError({
+          message: e.response?.data?.message || "Something went wrong",
+        })
+      );
+    },
+  });
+
+  const onSubmit = (values: IAddAllergy) => {
+    const formData = new FormData();
+
+    const symptoms = values.symptoms.split(",");
+
+    formData.append("name", values.name);
+    formData.append("symptoms", symptoms.toString());
+    formData.append("isHighRisk", String(values.isHighRisk));
+    formData.append("severity", values.severity);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    formData.append("file", image as any);
+
+    addAllergy.mutate(formData);
+  };
+
+  const formik = useFormik<IAddAllergy>({
+    initialValues: {
+      isHighRisk: false,
+      name: "",
+      severity: "",
+      symptoms: "",
+      notes: "",
+    },
+    validationSchema: AddNewAllergySchema,
+    validateOnBlur: false,
+    validateOnChange: false,
+    onSubmit: (values) => {
+      onSubmit(values);
+    },
+  });
 
   return (
     <React.Fragment>
@@ -119,14 +198,35 @@ const NewAllergy = () => {
                       />
                     </Button>
                   </Box>
-                  <TextField label="Allergy Name" fullWidth />
+                  <TextField
+                    label="Allergy Name"
+                    fullWidth
+                    value={formik.values.name}
+                    onChange={formik.handleChange("name")}
+                    error={formik.errors.name ? true : false}
+                    helperText={formik.errors.name}
+                  />
                   <TextField
                     label="Symptoms"
                     fullWidth
                     placeholder="headache, vomiting (comma separated)"
+                    value={formik.values.symptoms}
+                    onChange={formik.handleChange("symptoms")}
+                    error={formik.errors.symptoms ? true : false}
+                    helperText={formik.errors.symptoms}
                   />
-                  <TextField label="Notes" fullWidth />
-                  <FormControl fullWidth>
+                  <TextField
+                    label="Notes"
+                    fullWidth
+                    value={formik.values.notes}
+                    onChange={formik.handleChange("notes")}
+                    error={formik.errors.notes ? true : false}
+                    helperText={formik.errors.notes}
+                  />
+                  <FormControl
+                    fullWidth
+                    error={formik.errors.severity ? true : false}
+                  >
                     <InputLabel id="demo-simple-select-label">
                       Severity
                     </InputLabel>
@@ -135,7 +235,11 @@ const NewAllergy = () => {
                       id="demo-simple-select"
                       label="Severity"
                       sx={{ textAlign: "left" }}
-                      onChange={(e) => console.log(e.target.value)}
+                      value={formik.values.severity}
+                      onChange={(e) =>
+                        formik.setFieldValue("severity", e.target.value)
+                      }
+                      error={formik.errors.notes ? true : false}
                     >
                       {severityList.map((s) => (
                         <MenuItem value={s.value} key={s.value}>
@@ -143,18 +247,29 @@ const NewAllergy = () => {
                         </MenuItem>
                       ))}
                     </Select>
+                    {!!formik.errors.severity && (
+                      <FormHelperText error id="accountId-error">
+                        {formik.errors.severity}
+                      </FormHelperText>
+                    )}
                   </FormControl>
                   <FormControlLabel
                     control={
                       <Checkbox
-                        defaultChecked
-                        onChange={(e) => console.log(e.target.checked)}
+                        onChange={(e) =>
+                          formik.setFieldValue("isHighRisk", e.target.checked)
+                        }
                       />
                     }
                     label="This allergy is high risk"
                   />
-                  <Button fullWidth variant="contained">
-                    Save
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    onClick={formik.submitForm}
+                    disabled={addAllergy.isLoading}
+                  >
+                    {addAllergy.isLoading ? "Loading..." : "Save"}
                   </Button>
                 </Stack>
               </CardContent>

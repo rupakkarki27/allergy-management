@@ -17,6 +17,16 @@ class Allergy {
 
     return response.data;
   }
+
+  async createAllergy(body: FormData) {
+    const response = await api.post<IAllergy>(`${this.uri}`, body, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return response.data;
+  }
 }
 
 const AllergyService = new Allergy();
