@@ -34,7 +34,7 @@ client
 
 ### Before Running this application
 
-1. Run `yarn` at the top level of this project.
+1. Run `yarn` at the top level of this project. In `apps/model`, run `yarn build`
 2. Create a `.env` file and use the `.env.example` file to add values.
 3. In `client/`, run `yarn dev` to start the developement server.
 

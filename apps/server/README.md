@@ -43,7 +43,7 @@ server
 
 ### Before Running this application
 
-0. Run `yarn` at the top level of this project.
+0. Run `yarn` at the top level of this project. In `apps/model`, run `yarn build`
 1. Create a `.env` file and use the `.env.example` file to get a reference of values. You may need to create a cloudinary account. It's free :)
 2. In `server/`, run `docker compose up -d` if you want to use the docker compose included in this project. For now, only the database runs in docker.
 3. Run `yarn start:dev` to start in dev mode.
