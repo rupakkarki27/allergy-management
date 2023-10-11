@@ -28,6 +28,7 @@ import { useAppDispatch } from "../../store";
 import { IApiErrorResponse } from "@allergy-management/models";
 import { AxiosError } from "axios";
 import { setSuccess, setError } from "../../store/Snackbar/snackbar.slice";
+import HideControl from "../../components/HideControl";
 
 const AllergyDetail = () => {
   const [showDeleteAlert, setShowDeleteModal] = useState(false);
@@ -91,25 +92,29 @@ const AllergyDetail = () => {
             sx={{ width: 200 }}
             justifyContent={"space-between"}
           >
-            <Grid item>
-              <Button
-                startIcon={<Edit />}
-                variant="outlined"
-                onClick={() => navigate(`/allergies/${id}/edit`)}
-              >
-                Edit
-              </Button>
-            </Grid>
-            <Grid item>
-              <Button
-                startIcon={<Delete />}
-                variant="outlined"
-                color="error"
-                onClick={() => setShowDeleteModal(true)}
-              >
-                Delete
-              </Button>
-            </Grid>
+            <HideControl>
+              <Grid item>
+                <Button
+                  startIcon={<Edit />}
+                  variant="outlined"
+                  onClick={() => navigate(`/allergies/${id}/edit`)}
+                >
+                  Edit
+                </Button>
+              </Grid>
+            </HideControl>
+            <HideControl>
+              <Grid item>
+                <Button
+                  startIcon={<Delete />}
+                  variant="outlined"
+                  color="error"
+                  onClick={() => setShowDeleteModal(true)}
+                >
+                  Delete
+                </Button>
+              </Grid>
+            </HideControl>
           </Grid>
         </Grid>
         <Card sx={{ minHeight: 300, marginTop: 2, padding: 4 }}>
@@ -137,6 +142,7 @@ const AllergyDetail = () => {
               <Grid
                 sx={{ padding: 4, textAlign: "left", width: 500 }}
                 direction={"column"}
+                container
               >
                 <Grid item>
                   <Stack>
@@ -189,8 +195,8 @@ const AllergyDetail = () => {
                   </Typography>
                 </Stack>
                 <List>
-                  {allergy?.symptoms.map((s) => (
-                    <ListItemText sx={{ textAlign: "left" }}>
+                  {allergy?.symptoms.map((s, idx) => (
+                    <ListItemText sx={{ textAlign: "left" }} key={idx}>
                       - {s}
                     </ListItemText>
                   ))}

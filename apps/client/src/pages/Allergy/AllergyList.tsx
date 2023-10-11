@@ -14,6 +14,7 @@ import AllergyCard from "../../components/AllergyCard";
 import Layout from "../../components/Layout";
 import { Add } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import HideControl from "../../components/HideControl";
 
 const AllergyList = () => {
   const [{ page, pageSize }, setPagination] = React.useState({
@@ -48,15 +49,17 @@ const AllergyList = () => {
               <Link underline="hover" color="inherit"></Link>
             </Breadcrumbs>
           </Grid>
-          <Grid item>
-            <Button
-              startIcon={<Add />}
-              variant="outlined"
-              onClick={() => navigate("/allergies/add")}
-            >
-              New Allergy
-            </Button>
-          </Grid>
+          <HideControl>
+            <Grid item>
+              <Button
+                startIcon={<Add />}
+                variant="outlined"
+                onClick={() => navigate("/allergies/add")}
+              >
+                New Allergy
+              </Button>
+            </Grid>
+          </HideControl>
         </Grid>
         <Grid
           container
