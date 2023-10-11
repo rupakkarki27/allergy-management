@@ -10,6 +10,7 @@ import { AuthService } from './auth.service';
 import {
   InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 
 // const bcrypt = { hash, compare };
@@ -38,11 +39,16 @@ describe('Auth Service', () => {
       providers: [
         AuthService,
         UserService,
-        JwtService,
         ConfigService,
         {
           provide: USER_REPO_TOKEN,
           useValue: {},
+        },
+        {
+          provide: JwtService,
+          useValue: {
+            signAsync: jest.fn(),
+          },
         },
       ],
     }).compile();
@@ -112,6 +118,41 @@ describe('Auth Service', () => {
       expect(
         authService.validateUser('doesnotexist@gmail.com', 'password'),
       ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw UnauthorizedException if password does not match', async () => {
+      jest.spyOn(userService, 'getAllUserDetails').mockResolvedValueOnce(user);
+
+      jest
+        .spyOn(bcrypt, 'compare')
+        .mockImplementation(() => Promise.resolve(false));
+
+      expect(
+        authService.validateUser('rupakkarki123@gmail.com', 'password'),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+
+    describe('Generate token', () => {
+      it('should generate JWT token', async () => {
+        jest.spyOn(jwtService, 'signAsync').mockResolvedValueOnce('signed jwt');
+
+        expect(authService.generateToken(user)).resolves.toEqual({
+          accessToken: 'signed jwt',
+        });
+      });
+    });
+
+    describe('Sign in', () => {
+      it('should sign in a user and return access token', async () => {
+        jest
+          .spyOn(authService, 'generateToken')
+          .mockResolvedValueOnce({ accessToken: 'signed jwt' });
+
+        expect(authService.signIn(user)).resolves.toEqual({
+          token: 'signed jwt',
+          user,
+        });
+      });
     });
   });
 });
