@@ -10,6 +10,19 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
+// Mock the external module and the paginate function
+jest.mock('nestjs-typeorm-paginate', () => ({
+  paginate: jest.fn().mockResolvedValue({
+    items: [],
+    meta: {
+      itemCount: 0,
+      totalItems: 0,
+      totalPages: 0,
+      currentPage: 0,
+    },
+  }),
+}));
+
 const user = new User();
 user.email = 'rupakkarki123@gmail.com';
 user.role = UserRole.ADMIN;
@@ -51,14 +64,32 @@ describe('UserService', () => {
     expect(repo).toBeDefined();
   });
 
+  describe('Find all user by pagination', () => {
+    it('should find all users with pagination', async () => {
+      const all = await service.findAll({ limit: 10, page: 1 });
+
+      expect(all.items).toEqual([]);
+    });
+  });
+
   describe('Find user', () => {
-    it('should findOneByIdString', async () => {
-      jest.spyOn(service, 'findOneByIdString').mockResolvedValue(user);
+    it('should find one user by id', async () => {
+      jest.spyOn(repo, 'findOne').mockResolvedValue(user);
 
       const testUser = await service.findOneByIdString('example-uuid');
 
       expect(testUser).toBeDefined();
       expect(testUser).toEqual(user);
+    });
+
+    it('should find one user by find options', async () => {
+      jest.spyOn(repo, 'findOne').mockResolvedValueOnce(user);
+
+      expect(
+        await service.findOneByOptions({
+          where: { id: 'a-uuid', email: 'rupakkarki123@gmail.com' },
+        }),
+      ).toEqual(user);
     });
 
     it('should find user by email', () => {
@@ -122,6 +153,44 @@ describe('UserService', () => {
         }),
       ).rejects.toThrowError(ConflictException);
       expect(repoSpy).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('Update user', () => {
+    it('should update a user', async () => {
+      jest
+        .spyOn(repo, 'update')
+        .mockResolvedValueOnce({ raw: '', affected: 1, generatedMaps: [] });
+
+      expect(
+        await service.update('a-uuid', { email: 'newemail@gmail.com' }),
+      ).toEqual({ raw: '', affected: 1, generatedMaps: [] });
+    });
+
+    it('should throw an exception if update fails', async () => {
+      jest.spyOn(repo, 'update').mockRejectedValueOnce(new Error());
+
+      expect(() =>
+        service.update('wrong-uuid', { email: 'rupak@' }),
+      ).rejects.toThrow(BadRequestException);
+    });
+  });
+
+  describe('Delete user', () => {
+    it('should delete a user', async () => {
+      jest
+        .spyOn(repo, 'delete')
+        .mockResolvedValueOnce({ raw: '', affected: 1 });
+
+      expect(await service.delete('uuid')).toEqual({ raw: '', affected: 1 });
+    });
+
+    it('should throw a exception if deletion fails', async () => {
+      jest.spyOn(repo, 'delete').mockRejectedValueOnce(new Error());
+
+      expect(() => service.delete('wrong-uuid')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });
