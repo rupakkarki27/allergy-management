@@ -1,27 +1,58 @@
-# React + TypeScript + Vite
+## Allergy Management System Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the client application for allergy management.
 
-Currently, two official plugins are available:
+### Tools used
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- `React`, `Vite`, `TypeScript`
+- `Redux Toolkit`, `redux-persist` - For global state management and persistance
+- `React Query` - For data fetching, mutations, cache
+- `Axios` - API calling
+- `Material UI (MUI)` - Component Library
+- `Formik` and `Yup` - Form building and validation
 
-## Expanding the ESLint configuration
+### Directory Structure
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-   },
+```
+client
+├── src
+│   ├── assets - App assets like images, svgs, etc.
+│   ├── components - commonly used components throughout the application
+│   ├── pages - all the app pages, pages are contained inside their own directories
+│   ├── routes - route configs, index.tsx contains list of both private and public routes
+│   ├── services - services are defined here for api calls
+│   ├── store - redux store and toolkit slices are stored here
+│   ├── main.tsx
+│   ├── App.tsx
+│   ├── config.ts - .env config export
+├── index.html
+├── README.md
+├── .env
+├── vite.config.ts
+└── package.json
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+### Before Running this application
+
+1. Run `yarn` at the top level of this project.
+2. Create a `.env` file and use the `.env.example` file to add values.
+3. In `client/`, run `yarn dev` to start the developement server.
+
+### Adding a New Page
+
+To add a new page
+
+- Create the page component inside `pages/` inside a suitable directory.
+- Add the routes inside `routes/index.tsx`. If it is a public page, add it to the public route, if you only want logged in users to access the route, add it into the private routes.
+
+### Access Control
+
+This project contains a `HideControl` component that when used, will only render the child component if the logged in user has an admin role.
+
+Usage:
+
+```javascript
+<HideControl>
+  <ChildComponent />
+</HideControl>
+```

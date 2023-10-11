@@ -5,6 +5,7 @@ This is the server app for allergy management system.
 Postman Collection: https://www.postman.com/material-observer-62980753/workspace/rupak-s-public-workspace/collection/30188658-dce736ab-a1c2-4f4f-980c-03c9f93073a1?action=share&creator=30188658
 
 ### Tools used
+
 - `NestJS`
 - `TypeORM` - For database operations, as ORM
 - `PostgreSQL`
@@ -13,6 +14,7 @@ Postman Collection: https://www.postman.com/material-observer-62980753/workspace
 - `False` - For fake data in seeders
 
 ### Directory Structure
+
 ```
 server
 ├── src
@@ -40,6 +42,7 @@ server
 ```
 
 ### Before Running this application
+
 0. Run `yarn` at the top level of this project.
 1. Create a `.env` file and use the `.env.example` file to get a reference of values. You may need to create a cloudinary account. It's free :)
 2. In `server/`, run `docker compose up -d` if you want to use the docker compose included in this project. For now, only the database runs in docker.
@@ -48,6 +51,7 @@ server
 ### Modules
 
 There are 4 modules in this project:
+
 - `Allergy` - Contains controllers, services, DTOs, entities, for allergy
 - `User` - Contains controllers, services, DTOs, entities, for user
 - `Cloudinary` - Contains cloudinary service to upload photos to cloudinary
@@ -95,7 +99,6 @@ export class UserService extends CrudService<User> {
 }
 ```
 
-
 #### Crud Controller
 
 You can use the generic crud controller as follows:
@@ -106,9 +109,7 @@ First create the controller file. For eg: user.controller.ts
 @Controller('users')
 @ApiTags('users')
 export class UserController extends CrudController<User> {
-  constructor(
-    private userService: UserService,
-  ) {
+  constructor(private userService: UserService) {
     super(userService);
   }
   // this will generate a controller with predefined routes for the resource
@@ -119,19 +120,272 @@ export class UserController extends CrudController<User> {
 ### Migrations and Seeds
 
 There are two scripts for migration in `package.json`.
+
 - To generate a migration:
+
 ```bash
 yarn migration:generate migration/<your_migration_name>
 ```
 
 - To run migrations:
+
 ```bash
 yarn migration:run
 ```
 
 - To run seeders:
+
 ```bash
 yarn seed:run
 ```
 
 To add more seeders, see [typeorm-seeding](https://github.com/w3tecch/typeorm-seeding). Note that the faker package has been replaced by `falso` in this project. For reference, see: `src/database`.
+
+### API DOCUMENTATION
+
+Please expand each api definition.
+
+#### Authentication
+
+<details>
+ <summary><code>POST</code> <code><b>/api/auth/signup</b></code> <code>(Signup)</code></summary>
+
+##### Request Body Example
+
+```json
+{
+  "email": "email@gmail.com",
+  "password": "Password@123",
+  "role": "admin"
+}
+```
+
+##### Responses
+
+- 201: Created
+
+```json
+{
+  "email": "email@gmail.com",
+  "role": "admin",
+  "id": "1ffced5f-cc79-44a0-b73f-b09ac85c981b",
+  "createdAt": "2023-10-11T05:19:32.649Z",
+  "updatedAt": "2023-10-11T05:19:32.649Z"
+}
+```
+
+- 400: Bad Request
+
+```json
+{
+  "message": [
+    {
+      "field": "email",
+      "message": "Please enter a valid email"
+    }
+  ],
+  "error": "Bad Request",
+  "statusCode": 400
+}
+```
+
+</details>
+
+<details>
+ <summary><code>POST</code> <code><b>/api/auth/signin</b></code> <code>(Signin)</code></summary>
+
+##### Request Body Example
+
+```json
+{
+  "email": "email@gmail.com",
+  "password": "Password@123"
+}
+```
+
+##### Responses
+
+- 201
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InJ1cGFra2Fya2kxMjNAZ21haWwuY29tIiwic3ViIjoiNTdiNzQyZmYtMjA2Ny00NTBhLTk2NWItZGVjZDk2ODdiODhjIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNjk3MDAxNTIyLCJleHAiOjE2OTcwMDg3MjJ9.jYIIId35Z1inBRnZruRi9SwXVVc8rcdhnnqLrzVf-4o",
+  "user": {
+    "id": "57b742ff-2067-450a-965b-decd9687b88c",
+    "createdAt": "2023-10-09T03:53:36.268Z",
+    "updatedAt": "2023-10-09T03:53:36.268Z",
+    "email": "email@gmail.com",
+    "role": "admin"
+  }
+}
+```
+
+- 401: Unauthorized
+
+```json
+{
+  "message": "Username or password doesnot match",
+  "error": "Unauthorized",
+  "statusCode": 401
+}
+```
+
+</details>
+
+---
+
+#### Allergy
+
+All these routes require Authorization header: Bearer token
+
+<details>
+ <summary><code>POST</code> <code><b>/api/allergies</b></code> <code>(Create New Allergy)</code></summary>
+
+##### Request Body Example
+
+Content Type: `multipart/form-data`
+
+```typescript
+- name: string
+- symptoms: string[]
+- severity: MILD | MODERATE | SEVERE | LIFE THREATENING | DEATH
+- isHighRisk: boolean
+- file: image file
+- notes: string
+```
+
+##### Responses
+
+- 201: Created
+
+```json
+{
+  "name": "asdasd",
+  "symptoms": ["asdasd"],
+  "severity": "MILD",
+  "isHighRisk": true,
+  "image": "http://res.cloudinary.com/dkzjnxh1o/image/upload/v1697002107/h6ijzwrpppqlopx3jtxq.jpg",
+  "notes": "asdasd",
+  "id": "f465ae14-b75e-42a4-8082-efe0b03a0607",
+  "createdAt": "2023-10-11T05:28:28.230Z",
+  "updatedAt": "2023-10-11T05:28:28.230Z"
+}
+```
+
+- 401: Unauthorized
+
+```json
+{
+  "message": "Username or password doesnot match",
+  "error": "Unauthorized",
+  "statusCode": 401
+}
+```
+
+</details>
+
+<details>
+ <summary><code>GET</code> <code><b>/api/allergies</b></code> <code>(Get all Allergies with Pagination)</code></summary>
+
+High Risk Allergies are always listed first with alphabetical sorting
+
+##### Query Params
+
+> | name  | type     | data type | description         |
+> | ----- | -------- | --------- | ------------------- |
+> | page  | required | number    | Current Page Number |
+> | limit | required | number    | Limit per page      |
+
+##### Responses
+
+- 200: OK
+
+```json
+{
+  "items": [
+    {
+      "id": "1a79bd18-cf85-409a-9186-5b22455305f9",
+      "createdAt": "2023-10-09T07:41:30.536Z",
+      "updatedAt": "2023-10-10T07:39:07.602Z",
+      "name": "asdasd",
+      "symptoms": ["asdasd"],
+      "severity": "DEATH",
+      "isHighRisk": true,
+      "image": "http://res.cloudinary.com/dkzjnxh1o/image/upload/v1696837289/ej4sffov5qz0qmwh9vai.jpg",
+      "notes": "hi"
+    }
+  ],
+  "meta": {
+    "totalItems": 24,
+    "itemCount": 1,
+    "itemsPerPage": 1,
+    "totalPages": 24,
+    "currentPage": 1
+  }
+}
+```
+
+</details>
+
+<details>
+ <summary><code>PUT</code> <code><b>/api/allergies/{id}</b></code> <code>(Update an allergy)</code></summary>
+
+##### Params
+
+> | name | type     | data type | description       |
+> | ---- | -------- | --------- | ----------------- |
+> | id   | required | uuid      | ID of the allergy |
+
+##### Request Boody
+
+```json
+{
+  "name": "string",
+  "symptoms": ["string"],
+  "severity": "string",
+  "isHighRisk": true,
+  "notes": "string"
+}
+```
+
+</details>
+
+<details>
+ <summary><code>DELETE</code> <code><b>/api/allergies/{id}</b></code> <code>(Delete an allergy)</code></summary>
+
+##### Params
+
+> | name | type     | data type | description       |
+> | ---- | -------- | --------- | ----------------- |
+> | id   | required | uuid      | ID of the allergy |
+
+</details>
+
+<details>
+ <summary><code>GET</code> <code><b>/api/allergies/{id}</b></code> <code>(Get an allergy)</code></summary>
+
+##### Params
+
+> | name | type     | data type | description       |
+> | ---- | -------- | --------- | ----------------- |
+> | id   | required | uuid      | ID of the allergy |
+
+##### Response
+
+- 200: OK
+
+```json
+{
+  "id": "1a79bd18-cf85-409a-9186-5b22455305f9",
+  "createdAt": "2023-10-09T07:41:30.536Z",
+  "updatedAt": "2023-10-10T07:39:07.602Z",
+  "name": "asdasd",
+  "symptoms": ["asdasd"],
+  "severity": "DEATH",
+  "isHighRisk": true,
+  "image": "http://res.cloudinary.com/dkzjnxh1o/image/upload/v1696837289/ej4sffov5qz0qmwh9vai.jpg",
+  "notes": "hi"
+}
+```
+
+</details>
